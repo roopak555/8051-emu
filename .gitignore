@@ -1,0 +1,5 @@
+*.o
+*.out
+*.exe
+emulator
+lib8051.so
