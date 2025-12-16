@@ -7,11 +7,29 @@
 #include "opc.h"
 #include "debug.h"
 
+static void print_banner(void)
+{
+    printf("\n");
+    printf(" █████  ████   ██████  █████  \n");
+    printf(" █   █ █    █  ██      █  ██  \n");
+    printf(" █████ █    █  ██████     ██  \n");
+    printf(" █   █ █    █       █     ██  \n");
+    printf(" █████  ████   ██████   █████ \n");
+    printf("\n");
+    printf("      8051 MICROCONTROLLER EMULATOR\n");
+    printf("      --------------------------------\n");
+    printf("      Language: C\n");
+    printf("      Mode    : Debug / Step / Breakpoint\n");
+    printf("\n");
+}
+
+
 
 
 //print CPU status 
 static void cpu_status(void) {
-    printf("=== CPU STATE ===\n");
+    
+    printf("\n=== CPU STATE ===\n");
     printf("PC  = 0x%04X\n", (unsigned)cpu.PC);
     printf("A   = 0x%02X (%u)\n", (unsigned)cpu.A, (unsigned)cpu.A);
     printf("B   = 0x%02X\n", (unsigned)cpu.B);
@@ -26,6 +44,8 @@ int main(int argc,char **argv){
     (void) argc;
     (void) argv;
 
+    print_banner();
+
     cpu_reset();
     debug_enable(true);
     debug_set_step(false);   
@@ -34,7 +54,6 @@ int main(int argc,char **argv){
 
 
     const uint8_t sample_prog[]={
-   // ---- main ----
     0x74, 0x11,       // MOV A,#11h
     0xF5, 0x30,       // MOV 30h,A
     0xD0, 0x30,       // PUSH 30h
