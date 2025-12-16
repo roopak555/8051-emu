@@ -10,6 +10,9 @@ void debug_enable(bool enable);
 /* Print CPU state after each instruction */
 void debug_trace(uint16_t pc_before, uint8_t opcode);
 
+bool debug_is_enabled(void);
+
+
 void debug_set_step(bool enable);
 void debug_wait_if_step(void);
 void debug_set_breakpoint(uint16_t addr);

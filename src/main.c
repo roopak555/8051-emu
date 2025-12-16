@@ -29,6 +29,7 @@ int main(int argc,char **argv){
     cpu_reset();
     debug_enable(true);
     debug_set_step(false);   
+
     debug_set_breakpoint(0x0006);   
 
 

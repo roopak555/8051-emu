@@ -32,8 +32,11 @@ void cpu_step(void){
         return;
 
     //  BREAKPOINT CHECK (BEFORE execution)
-    if (debug_check_breakpoint(cpu.PC)) {
+    if (debug_is_enabled() && debug_check_breakpoint(cpu.PC))        
+{
+        printf("\n");
         printf("*** BREAKPOINT HIT at PC=%04X ***\n", cpu.PC);
+        printf("\n");   
         debug_set_step(true);      // enter step mode
         debug_wait_if_step();      // pause BEFORE execution
     }

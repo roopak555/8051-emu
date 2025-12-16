@@ -4,12 +4,17 @@
 
 #include <stdio.h>
 
-static bool debug_on = false;
+ static bool debug_on = false;
 
 void debug_enable(bool enable)
 {
     debug_on = enable;
 }
+bool debug_is_enabled(void)
+{
+    return debug_on;
+}
+
 
 void debug_trace(uint16_t pc_before, uint8_t opcode)
 {
@@ -34,7 +39,7 @@ void debug_wait_if_step(void)
     if (!step_mode)
         return;
 
-    printf("Press Enter to continue...");
+    printf("(debug) press ENTER to step");
     fflush(stdout);
     getchar();
 }
@@ -81,90 +86,115 @@ void debug_dump_memory(uint8_t start, uint8_t end)
 }
 void debug_print_mnemonic(uint16_t pc, uint8_t opcode)
 {
-    switch (opcode)
-    {
-        case 0x00:
-            printf("NOP");
-            break;
+   switch (opcode)
+{
+    case 0x00:
+        printf("%-16s", "NOP");
+        break;
 
-        case 0x74:
-            printf("MOV A,#%02Xh", code_memory[pc + 1]);
-            break;
+    case 0x74:
+        printf("%-16s", 
+               ({ static char b[16]; 
+                  sprintf(b, "MOV A,#%02Xh", code_memory[pc + 1]); b; }));
+        break;
 
-        case 0x24:
-            printf("ADD A,#%02Xh", code_memory[pc + 1]);
-            break;
+    case 0x24:
+        printf("%-16s",
+               ({ static char b[16];
+                  sprintf(b, "ADD A,#%02Xh", code_memory[pc + 1]); b; }));
+        break;
 
-        case 0x04:
-            printf("INC A");
-            break;
+    case 0x04:
+        printf("%-16s", "INC A");
+        break;
 
-        case 0xE4:
-            printf("CLR A");
-            break;
+    case 0xE4:
+        printf("%-16s", "CLR A");
+        break;
 
-        case 0x80:
-            printf("SJMP %02Xh", code_memory[pc + 1]);
-            break;
+    case 0x80:
+        printf("%-16s",
+               ({ static char b[16];
+                  sprintf(b, "SJMP %02Xh", code_memory[pc + 1]); b; }));
+        break;
 
-        case 0xFF:
-            printf("HALT");
-            break;
+    case 0xFF:
+        printf("%-16s", "HALT");
+        break;
 
-        case 0x05:
-            printf("INC %02Xh", code_memory[pc + 1]);
-            break;
+    case 0x05:
+        printf("%-16s",
+               ({ static char b[16];
+                  sprintf(b, "INC %02Xh", code_memory[pc + 1]); b; }));
+        break;
 
-        case 0x15:
-            printf("DEC %02Xh", code_memory[pc + 1]);
-            break;
+    case 0x15:
+        printf("%-16s",
+               ({ static char b[16];
+                  sprintf(b, "DEC %02Xh", code_memory[pc + 1]); b; }));
+        break;
 
-        case 0xE5:
-            printf("MOV A,%02Xh", code_memory[pc + 1]);
-            break;
+    case 0xE5:
+        printf("%-16s",
+               ({ static char b[16];
+                  sprintf(b, "MOV A,%02Xh", code_memory[pc + 1]); b; }));
+        break;
 
-        case 0xF5:
-            printf("MOV %02Xh,A", code_memory[pc + 1]);
-            break;
+    case 0xF5:
+        printf("%-16s",
+               ({ static char b[16];
+                  sprintf(b, "MOV %02Xh,A", code_memory[pc + 1]); b; }));
+        break;
 
-        case 0xC0:
-            printf("POP %02Xh", code_memory[pc + 1]);
-            break;
+    case 0xC0:
+        printf("%-16s",
+               ({ static char b[16];
+                  sprintf(b, "POP %02Xh", code_memory[pc + 1]); b; }));
+        break;
 
-        case 0xD0:
-            printf("PUSH %02Xh", code_memory[pc + 1]);
-            break;
+    case 0xD0:
+        printf("%-16s",
+               ({ static char b[16];
+                  sprintf(b, "PUSH %02Xh", code_memory[pc + 1]); b; }));
+        break;
 
-        case 0x12:
-            printf("LCALL %02X%02Xh",
-                   code_memory[pc + 1],
-                   code_memory[pc + 2]);
-            break;
+    case 0x12:
+        printf("%-16s",
+               ({ static char b[16];
+                  sprintf(b, "LCALL %02X%02Xh",
+                          code_memory[pc + 1],
+                          code_memory[pc + 2]); b; }));
+        break;
 
-        case 0x22:
-            printf("RET");
-            break;
+    case 0x22:
+        printf("%-16s", "RET");
+        break;
 
-        default:
-            /* MOV A,Rn : E8–EF */
-            if ((opcode & 0xF8) == 0xE8)
-            {
-                printf("MOV A,R%d", opcode & 0x07);
-            }
-            /* MOV Rn,A : F8–FF (except FF which is HALT) */
-            else if ((opcode & 0xF8) == 0xF8 && opcode != 0xFF)
-            {
-                printf("MOV R%d,A", opcode & 0x07);
-            }
-            /* ADD A,Rn : 28–2F */
-            else if ((opcode & 0xF8) == 0x28)
-            {
-                printf("ADD A,R%d", opcode & 0x07);
-            }
-            else
-            {
-                printf("DB %02Xh", opcode);
-            }
-            break;
-    }
+    default:
+        if ((opcode & 0xF8) == 0xE8)
+        {
+            printf("%-16s",
+                   ({ static char b[16];
+                      sprintf(b, "MOV A,R%d", opcode & 0x07); b; }));
+        }
+        else if ((opcode & 0xF8) == 0xF8 && opcode != 0xFF)
+        {
+            printf("%-16s",
+                   ({ static char b[16];
+                      sprintf(b, "MOV R%d,A", opcode & 0x07); b; }));
+        }
+        else if ((opcode & 0xF8) == 0x28)
+        {
+            printf("%-16s",
+                   ({ static char b[16];
+                      sprintf(b, "ADD A,R%d", opcode & 0x07); b; }));
+        }
+        else
+        {
+            printf("%-16s",
+                   ({ static char b[16];
+                      sprintf(b, "DB %02Xh", opcode); b; }));
+        }
+        break;
+}
 }
